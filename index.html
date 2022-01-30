@@ -36,7 +36,7 @@
       // effect back to skyLane after touches groundLane
       const skyLane = 60;
       // effect amount
-      let effectAmount = 10000;
+      let effectAmount = 30000;
       // effect stay at ground for stay frames
       let stayTime = 100.0;
       // x speed
@@ -314,7 +314,7 @@
       };
 
       densityBar.oninput = () => {
-        effectAmount = (10000 * densityBar.value) / 30;
+        effectAmount = (30000 * densityBar.value) / 30;
         scene.remove(points);
         iniDrop();
         update();
