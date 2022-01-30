@@ -9,10 +9,10 @@
   </head>
   <body>
     <script type="module">
-      import * as THREE from "./node_modules/three/build/three.module.js";
-      import Stats from "./node_modules/three/examples/jsm/libs/stats.module.js";
-      import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
-      import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+      import * as THREE from "/node_modules/three/build/three.module.js";
+      import Stats from "/node_modules/three/examples/jsm/libs/stats.module.js";
+      import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls.js";
+      import { GLTFLoader } from "/node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 
       let camera,
         scene,
@@ -53,9 +53,9 @@
       // ambient light intensity
       let ambientLightIntensity = 1;
       // directional light intensity
-      let directionalLightIntensity = 2;
+      let directionalLightIntensity = 1;
       // space light intensity
-      let spaceLightIntensity = 2;
+      let spaceLightIntensity = 1;
 
       init();
       animate();
@@ -256,8 +256,8 @@
         scene.remove(directionalLight);
         scene.remove(spaceLight);
         ambientLightIntensity = 1;
-        directionalLightIntensity = 2;
-        spaceLightIntensity = 2;
+        directionalLightIntensity = 1;
+        spaceLightIntensity = 1;
         iniAmbinetLight();
         iniDirectionalLight();
         iniSpaceLight();
