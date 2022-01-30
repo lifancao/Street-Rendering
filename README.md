@@ -6,4 +6,4 @@ This is the final project for Advanced Course in Computer Graphics Course (Fall 
 
 ⚠️ It may take a while to load for the first time, and color and light might slightly vary due to different computer monitors.
 
-Thanks for your visiting and have fun!
+😊 Thanks for your visiting and have fun!
