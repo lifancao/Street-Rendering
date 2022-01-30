@@ -4,6 +4,6 @@ This is the final project for Advanced Course in Computer Graphics Course (Fall 
 
 ➡️ Please click the link: https://lifancao.github.io/acg-final-project/
 
-⚠️ It may take a few minutes to load for the first time, and color and light might slightly vary due to different monitors.
+⚠️ It may take a few minutes to load for the first time, and color might slightly vary due to different monitors.
 
 😊 Thanks for your visiting and have fun!
