@@ -5,13 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link type="text/css" rel="stylesheet" href="main.css" />
+    <script src="./node_modules/three/build/three.js"></script>
+    <script src="./node_modules/three/examples/js/libs/stats.min.js"></script>
+    <script src="./node_modules/three/examples/js/controls/OrbitControls.js"></script>
+    <script src="./node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
     <title>Final Project</title>
     <script type="module">
-      import * as THREE from "./node_modules/three/build/three.module.js";
-      import Stats from "./node_modules/three/examples/jsm/libs/stats.module.js";
-      import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
-      import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
-
       let camera,
         scene,
         ambientLight,
@@ -107,7 +106,7 @@
 
       // Load glTF resource
       function iniModel() {
-        loader = new GLTFLoader();
+        loader = new THREE.GLTFLoader();
         loader.load(
           "materials/scene.gltf",
           function (gltf) {
@@ -174,7 +173,7 @@
 
       // Set the controls
       function iniControls() {
-        controls = new OrbitControls(camera, renderer.domElement);
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.update();
       }
 
@@ -349,6 +348,8 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       };
     </script>
+  </head>
+  <body>
     <button id="button-day">day</button>
     <button id="button-night">night</button>
     <button id="button-snow">snow</button>
@@ -397,6 +398,5 @@
         step="1"
       />
     </div>
-  </head>
-  <body></body>
+  </body>
 </html>
