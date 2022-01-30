@@ -1,354 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="main.css"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="text/css" rel="stylesheet" href="main.css" />
     <title>Final Project</title>
-</head>
-<body>
+  </head>
+  <body>
     <script type="module">
-        import * as THREE from '/node_modules/three/build/three.module.js';
-        import Stats from '/node_modules/three/examples/jsm/libs/stats.module.js';
-        import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
-        import { GLTFLoader } from "/node_modules/three/examples/jsm/loaders/GLTFLoader.js";
-        
-        let camera, scene, ambientLight, directionalLight, pointLight, spaceLight, loader, points, geometry, renderer, controls;
+      import * as THREE from "./node_modules/three/build/three.module.js";
+      import Stats from "./node_modules/three/examples/jsm/libs/stats.module.js";
+      import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
+      import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 
-        let windowHalfX = window.innerWidth / 2;
-        let windowHalfY = window.innerHeight / 2;
+      let camera,
+        scene,
+        ambientLight,
+        directionalLight,
+        pointLight,
+        spaceLight,
+        loader,
+        points,
+        geometry,
+        renderer,
+        controls;
 
-        let bgImagePath = 'materials/images/sky-snow-day.jpeg';
-        let texturePath = 'materials/images/snowflake.png';
-        let isDay = true;
-        let isSnow = true;
+      let windowHalfX = window.innerWidth / 2;
+      let windowHalfY = window.innerHeight / 2;
 
-        // effect stop when y touches groundLane
-        const groundLane = 0;
-        // effect back to skyLane after touches groundLane
-        const skyLane = 60;
-        // effect amount
-        let effectAmount = 3000;
-        // effect stay at ground for stay frames
-        let stayTime = 100.0;
-        // x speed
-        let velocityX = 0.0;
-        // y speed
-        let velocityY = 0.3;
-        // z speed
-        let velocityZ = 0.0;
-        // drop size
-        let dropSize = 0.5;
-        // ambient light intensity
-        let ambientLightIntensity = 1;
-        // directional light intensity
-        let directionalLightIntensity = 2;
-        // space light intensity
-        let spaceLightIntensity = 2;
+      let bgImagePath = "materials/images/sky-snow-day.jpeg";
+      let texturePath = "materials/images/snowflake.png";
+      let isDay = true;
+      let isSnow = true;
 
+      // effect stop when y touches groundLane
+      const groundLane = 0;
+      // effect back to skyLane after touches groundLane
+      const skyLane = 60;
+      // effect amount
+      let effectAmount = 10000;
+      // effect stay at ground for stay frames
+      let stayTime = 100.0;
+      // x speed
+      let velocityX = 0.0;
+      // y speed
+      let velocityY = 0.1;
+      // z speed
+      let velocityZ = 0.0;
+      // drop size
+      let dropSize = 0.2;
+      // ambient light intensity
+      let ambientLightIntensity = 1;
+      // directional light intensity
+      let directionalLightIntensity = 2;
+      // space light intensity
+      let spaceLightIntensity = 2;
 
-        init();
-        animate();
+      init();
+      animate();
 
-        //Set the camera
-        function iniCamera(){
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(3, 2, 60);
+      //Set the camera
+      function iniCamera() {
+        camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.set(3, 2, 60);
+      }
+
+      // Set the scene
+      function iniScene() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.TextureLoader().load(bgImagePath);
+      }
+
+      // Set the ambient light
+      function iniAmbinetLight() {
+        ambientLight = new THREE.AmbientLight(0xffffff, ambientLightIntensity);
+        scene.add(ambientLight);
+      }
+
+      // Set the directional light
+      function iniDirectionalLight() {
+        directionalLight = new THREE.DirectionalLight(
+          0xffffff,
+          directionalLightIntensity
+        );
+        directionalLight.position.set(0, 1, 0);
+        scene.add(directionalLight);
+      }
+
+      // Set the point light
+      function iniPointLight() {
+        pointLight = new THREE.PointLight(0xffffff, 1, 200);
+        camera.add(pointLight);
+        scene.add(camera);
+      }
+
+      // Set the space light
+      function iniSpaceLight() {
+        spaceLight = new THREE.PointLight(0xffffff, spaceLightIntensity, 300);
+        spaceLight.position.set(5, 20, 40);
+        scene.add(spaceLight);
+      }
+
+      // Load glTF resource
+      function iniModel() {
+        loader = new GLTFLoader();
+        loader.load(
+          "materials/scene.gltf",
+          function (gltf) {
+            scene.add(gltf.scene);
+            gltf.animations; // Array <THREE.AnimationClip>
+            gltf.scene; // THREE.Group
+            gltf.scenes; // Array <THREE.Group>
+            gltf.cameras; // Array <THREE.Camera>
+            gltf.asset; // Object
+          },
+          // Called while loading is progressing
+          function (xhr) {
+            console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          },
+          // Called when loading has errors
+          function (error) {
+            console.log("An error happened");
+          }
+        );
+      }
+
+      // Set the drop
+      function iniDrop() {
+        // texture for snowflake and rain drop
+        let snowTexture = new THREE.TextureLoader().load(texturePath);
+        // snow material
+        let pointsMaterial = new THREE.PointsMaterial({
+          size: dropSize,
+          transparent: true,
+          opacity: 0.8,
+          map: snowTexture,
+          blending: THREE.AdditiveBlending,
+          sizeAttenuation: true,
+          depthTest: true,
+        });
+
+        let range = 100;
+        const pointsArray = [];
+
+        for (let i = 0; i < effectAmount; i++) {
+          pointsArray.push((Math.random(0.5) * range) / 1.8 - 15);
+          pointsArray.push(Math.random(0.5) * range * 2);
+          pointsArray.push(Math.random(0.5) * range * 1.2 - 40);
+          pointsArray.push(0.0);
         }
 
-        // Set the scene
-        function iniScene(){
-            scene = new THREE.Scene();
-            scene.background = new THREE.TextureLoader().load(bgImagePath);
-        }
-        
-        // Set the ambient light
-        function iniAmbinetLight(){
-            ambientLight = new THREE.AmbientLight(0xffffff, ambientLightIntensity);
-			scene.add(ambientLight);
-        }
+        geometry = new THREE.BufferGeometry();
+        geometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(pointsArray, 4)
+        );
+        points = new THREE.Points(geometry, pointsMaterial);
+        points.position.y = 0.5;
+        scene.add(points);
+      }
 
-        // Set the directional light
-        function iniDirectionalLight(){
-            directionalLight = new THREE.DirectionalLight(0xffffff, directionalLightIntensity);
-            directionalLight.position.set(0, 1, 0);
-            scene.add(directionalLight);
-        }
+      // Set the renderer
+      function iniRenderer() {
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+      }
 
-        // Set the point light
-        function iniPointLight(){
-            pointLight = new THREE.PointLight(0xffffff, 1, 200);
-            camera.add(pointLight);
-            scene.add(camera);
-        }
+      // Set the controls
+      function iniControls() {
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.update();
+      }
 
-        // Set the space light
-        function iniSpaceLight() {
-            spaceLight = new THREE.PointLight(0xffffff, spaceLightIntensity, 300);
-            spaceLight.position.set(5, 20, 40);
-            scene.add(spaceLight);
-        }
-
-        // Load glTF resource
-        function iniModel(){
-            loader = new GLTFLoader();
-            loader.load(
-                'materials/scene.gltf',
-                function (gltf) {
-                    scene.add( gltf.scene );
-                    gltf.animations; // Array <THREE.AnimationClip>
-                    gltf.scene; // THREE.Group
-                    gltf.scenes; // Array <THREE.Group>
-                    gltf.cameras; // Array <THREE.Camera>
-                    gltf.asset; // Object
-                },
-                // Called while loading is progressing
-                function (xhr) {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
-                // Called when loading has errors
-                function (error) {
-                    console.log('An error happened');
-                }
-            );
-        }
-
-        // Set the drop
-        function iniDrop(){
-            // texture for snowflake and rain drop
-            let snowTexture = new THREE.TextureLoader().load(texturePath);
-            // snow material
-            let pointsMaterial = new THREE.PointsMaterial({
-                size: dropSize,
-                transparent: true,
-                opacity: 0.8,
-                map: snowTexture,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true,
-                depthTest: true
-            });
-
-            let range = 100;
-            const pointsArray = [];
-
-            for(let i = 0; i < effectAmount; i++){
-                pointsArray.push(Math.random(0.5) * range / 1.8 - 15);
-                pointsArray.push(Math.random(0.5) * range * 2);
-                pointsArray.push(Math.random(0.5) * range * 1.2 - 40);
-                pointsArray.push(0.0);
+      // Update the snow falling
+      function update() {
+        let stats = new Stats();
+        stats.update();
+        var vertices = points.geometry.attributes.position.array;
+        let index = 0;
+        for (let i = 0; i < vertices.length; i++) {
+          // x position update
+          vertices[index] -= velocityX;
+          // y position update
+          if (vertices[index + 1] >= groundLane) {
+            // in sky
+            vertices[index + 1] -= velocityY;
+          } else {
+            // at ground
+            if (vertices[index + 3] >= stayTime) {
+              // over duration
+              vertices[index + 1] = skyLane;
+              vertices[index + 3] = 0.0;
+            } else {
+              // in duration
+              vertices[index + 3] += 1;
             }
-
-            geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(pointsArray, 4));
-            points = new THREE.Points(geometry, pointsMaterial);
-            points.position.y = 0.5;
-            scene.add(points);
+          }
+          //z position update
+          vertices[index + 2] -= velocityZ;
+          index += 4;
         }
+        points.geometry.attributes.position.needsUpdate = true;
+      }
 
-        // Set the renderer
-        function iniRenderer(){
-            renderer = new THREE.WebGLRenderer();
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+      // Init
+      function init() {
+        iniCamera();
+        iniScene();
+        iniAmbinetLight();
+        iniDirectionalLight();
+        iniPointLight();
+        iniSpaceLight();
+        iniModel();
+        iniDrop();
+        iniRenderer();
+        iniControls();
+      }
+
+      // Animate
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        update();
+        points.geometry.attributes.position.needsUpdate = true;
+        renderer.render(scene, camera);
+      }
+
+      // Bind onclick event
+      const dayButton = document.getElementById("button-day");
+      const nightButton = document.getElementById("button-night");
+      const snowButton = document.getElementById("button-snow");
+      const rainButton = document.getElementById("button-rain");
+      const densityBar = document.getElementById("bar-density");
+      const speedBar = document.getElementById("bar-speed");
+      const staytimeBar = document.getElementById("bar-staytime");
+      const dropsizeBar = document.getElementById("bar-dropsize");
+
+      dayButton.onclick = () => {
+        isDay = true;
+        if (isSnow) {
+          bgImagePath = "materials/images/sky-snow-day.jpeg";
+        } else {
+          bgImagePath = "materials/images/sky-rain-day.jpeg";
         }
+        scene.background = new THREE.TextureLoader().load(bgImagePath);
+        scene.remove(ambientLight);
+        scene.remove(directionalLight);
+        scene.remove(spaceLight);
+        ambientLightIntensity = 1;
+        directionalLightIntensity = 2;
+        spaceLightIntensity = 2;
+        iniAmbinetLight();
+        iniDirectionalLight();
+        iniSpaceLight();
+      };
 
-        // Set the controls
-        function iniControls(){           
-            controls = new OrbitControls(camera, renderer.domElement);
-            controls.update();
+      nightButton.onclick = () => {
+        isDay = false;
+        if (isSnow) {
+          bgImagePath = "materials/images/sky-snow-night.jpeg";
+        } else {
+          bgImagePath = "materials/images/sky-rain-night.jpeg";
         }
+        scene.background = new THREE.TextureLoader().load(bgImagePath);
+        scene.remove(ambientLight);
+        scene.remove(directionalLight);
+        scene.remove(spaceLight);
+        ambientLightIntensity = 0;
+        directionalLightIntensity = 0;
+        spaceLightIntensity = 0.2;
+        iniAmbinetLight();
+        iniDirectionalLight();
+        iniSpaceLight();
+      };
 
-        // Update the snow falling
-        function update(){
-            let stats = new Stats();
-            stats.update();
-            var vertices = points.geometry.attributes.position.array;
-            let index = 0;
-            for (let i = 0; i < vertices.length; i++){
-                // x position update
-                vertices[index] -= velocityX;
-                // y position update
-                if(vertices[index + 1] >= groundLane){ // in sky
-                    vertices[index + 1] -= velocityY;
-                }
-                else{ // at ground
-                    if(vertices[index + 3] >= stayTime){ // over duration
-                        vertices[index + 1] = skyLane;
-                        vertices[index + 3] = 0.0;
-                    }
-                    else{ // in duration
-                        vertices[index + 3] += 1;
-                    }
-                }
-                //z position update
-                vertices[index + 2] -= velocityZ;
-                index += 4;
-            }
-            points.geometry.attributes.position.needsUpdate = true;
+      snowButton.onclick = () => {
+        isSnow = true;
+        texturePath = "materials/images/snowflake.png";
+        velocityY = 0.3;
+        dropSize = 0.5;
+        let stayTime = 100;
+        if (isDay) {
+          bgImagePath = "materials/images/sky-snow-day.jpeg";
+        } else {
+          bgImagePath = "materials/images/sky-snow-night.jpeg";
         }
+        scene.remove(points);
+        iniDrop();
+        update();
+        scene.background = new THREE.TextureLoader().load(bgImagePath);
+      };
 
-        // Init
-        function init(){
-            iniCamera();
-            iniScene();
-            iniAmbinetLight();
-            iniDirectionalLight();
-            iniPointLight();
-            iniSpaceLight();
-            iniModel();
-            iniDrop();
-            iniRenderer();
-            iniControls();
+      rainButton.onclick = () => {
+        isSnow = false;
+        texturePath = "materials/images/rain.png";
+        velocityY = 0.5;
+        dropSize = 0.3;
+        stayTime = 10;
+        if (isDay) {
+          bgImagePath = "materials/images/sky-rain-day.jpeg";
+        } else {
+          bgImagePath = "materials/images/sky-rain-night.jpeg";
         }
+        scene.remove(points);
+        iniDrop();
+        update();
+        scene.background = new THREE.TextureLoader().load(bgImagePath);
+      };
 
-        // Animate
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            update();
-            points.geometry.attributes.position.needsUpdate = true;
-            renderer.render(scene, camera);
-        }
+      densityBar.oninput = () => {
+        effectAmount = (10000 * densityBar.value) / 30;
+        scene.remove(points);
+        iniDrop();
+        update();
+      };
 
-        // Bind onclick event
-        const dayButton = document.getElementById('button-day');
-        const nightButton = document.getElementById('button-night');
-        const snowButton = document.getElementById('button-snow');
-        const rainButton = document.getElementById('button-rain');
-        const densityBar = document.getElementById('bar-density');
-        const speedBar = document.getElementById('bar-speed');
-        const staytimeBar = document.getElementById('bar-staytime');
-        const dropsizeBar = document.getElementById('bar-dropsize');
+      speedBar.oninput = () => {
+        velocityY = (0.3 * speedBar.value) / 50;
+        scene.remove(points);
+        iniDrop();
+        update();
+      };
 
-        dayButton.onclick = () => {
-            isDay = true;
-            if (isSnow) {
-                bgImagePath = 'materials/images/sky-snow-day.jpeg';
-            }
-            else {
-                bgImagePath = 'materials/images/sky-rain-day.jpeg';
-            }
-            scene.background = new THREE.TextureLoader().load(bgImagePath);
-            scene.remove(ambientLight);
-            scene.remove(directionalLight);
-            scene.remove(spaceLight);
-            ambientLightIntensity = 1;
-            directionalLightIntensity = 2;
-            spaceLightIntensity = 2;
-            iniAmbinetLight();
-            iniDirectionalLight();
-            iniSpaceLight();
-        }
+      staytimeBar.oninput = () => {
+        stayTime = (100 * staytimeBar.value) / 50;
+        scene.remove(points);
+        iniDrop();
+        update();
+      };
 
-        nightButton.onclick = () => {
-            isDay = false;
-            if (isSnow) {
-                bgImagePath = 'materials/images/sky-snow-night.jpeg';
-            }
-            else {
-                bgImagePath = 'materials/images/sky-rain-night.jpeg';
-            }
-            scene.background = new THREE.TextureLoader().load(bgImagePath);
-            scene.remove(ambientLight);
-            scene.remove(directionalLight);
-            scene.remove(spaceLight);
-            ambientLightIntensity = 0.3;
-            directionalLightIntensity = 0.3;
-            spaceLightIntensity = 1;
-            iniAmbinetLight();
-            iniDirectionalLight();
-            iniSpaceLight();
-        }
+      dropsizeBar.oninput = () => {
+        dropSize = (0.2 * dropsizeBar.value) / 50;
+        scene.remove(points);
+        iniDrop();
+        update();
+      };
 
-        snowButton.onclick = () => {
-            isSnow = true;
-            texturePath = 'materials/images/snowflake.png';
-            velocityY = 0.3;
-            dropSize = 0.5;
-            let stayTime = 100;
-            if (isDay) {
-                bgImagePath = 'materials/images/sky-snow-day.jpeg';
-            }
-            else {
-                bgImagePath = 'materials/images/sky-snow-night.jpeg';
-            }
-            scene.remove(points);
-            iniDrop();
-            update();
-            scene.background = new THREE.TextureLoader().load(bgImagePath);
-        }
-
-        rainButton.onclick = () => {
-            isSnow = false;
-            texturePath = 'materials/images/rain.png';
-            velocityY = 0.5;
-            dropSize = 0.3;
-            stayTime = 10;
-            if (isDay) {
-                bgImagePath = 'materials/images/sky-rain-day.jpeg';
-            }
-            else {
-                bgImagePath = 'materials/images/sky-rain-night.jpeg';
-            }
-            scene.remove(points);
-            iniDrop();
-            update();
-            scene.background = new THREE.TextureLoader().load(bgImagePath);
-        }
-
-        densityBar.oninput = () => {
-            effectAmount = 3000 * densityBar.value / 30;
-            scene.remove(points);
-            iniDrop();
-            update();
-        }
-
-        speedBar.oninput = () => {
-            velocityY = 0.3 * speedBar.value / 50;
-            scene.remove(points);
-            iniDrop();
-            update();
-        }
-
-        staytimeBar.oninput = () => {
-            stayTime = 100 * staytimeBar.value / 50;
-            scene.remove(points);
-            iniDrop();
-            update();
-        }
-
-        dropsizeBar.oninput = () => {
-            dropSize = 0.5 * dropsizeBar.value / 50;
-            scene.remove(points);
-            iniDrop();
-            update();
-        }
-
-        // Adjust the window size
-        window.onresize = function() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        
+      // Adjust the window size
+      window.onresize = function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      };
     </script>
-    <button id='button-day'>day</button>
-    <button id='button-night'>night</button>
-    <button id='button-snow'>snow</button>
-    <button id='button-rain'>rain</button>
-    <div id='div-density'>
-        <div>density</div><input id="bar-density" type="range" min="0" max="100" value="30" step="1">
+    <button id="button-day">day</button>
+    <button id="button-night">night</button>
+    <button id="button-snow">snow</button>
+    <button id="button-rain">rain</button>
+    <div id="div-density">
+      <div>density</div>
+      <input
+        id="bar-density"
+        type="range"
+        min="0"
+        max="100"
+        value="30"
+        step="1"
+      />
     </div>
-    <div id='div-speed'>
-        <div>speed</div><input id="bar-speed" type="range" min="0" max="100" value="50" step="1">
+    <div id="div-speed">
+      <div>speed</div>
+      <input
+        id="bar-speed"
+        type="range"
+        min="0"
+        max="100"
+        value="50"
+        step="1"
+      />
     </div>
-    <div id='div-staytime'>
-        <div>stay time</div><input id="bar-staytime" type="range" min="0" max="100" value="50" step="1">
+    <div id="div-staytime">
+      <div>stay time</div>
+      <input
+        id="bar-staytime"
+        type="range"
+        min="0"
+        max="100"
+        value="50"
+        step="1"
+      />
     </div>
-    <div id='div-dropsize'>
-        <div>drop size</div><input id="bar-dropsize" type="range" min="0" max="100" value="50" step="1">
+    <div id="div-dropsize">
+      <div>drop size</div>
+      <input
+        id="bar-dropsize"
+        type="range"
+        min="0"
+        max="100"
+        value="50"
+        step="1"
+      />
     </div>
-</body>
+  </body>
 </html>
