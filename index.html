@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link type="text/css" rel="stylesheet" href="main.css" />
+    <link type="text/css" rel="stylesheet" href="./main.css" />
     <title>Final Project</title>
   </head>
   <body>
     <script type="module">
-      import * as THREE from "/node_modules/three/build/three.module.js";
-      import Stats from "/node_modules/three/examples/jsm/libs/stats.module.js";
-      import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls.js";
-      import { GLTFLoader } from "/node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+      import * as THREE from "./node_modules/three/build/three.module.js";
+      import Stats from "./node_modules/three/examples/jsm/libs/stats.module.js";
+      import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
+      import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 
       let camera,
         scene,
@@ -29,8 +29,8 @@
       let windowHalfX = window.innerWidth / 2;
       let windowHalfY = window.innerHeight / 2;
 
-      let bgImagePath = "materials/images/sky-snow-day.jpeg";
-      let texturePath = "materials/images/snowflake.png";
+      let bgImagePath = "./materials/images/sky-snow-day.jpeg";
+      let texturePath = "./materials/images/snowflake.png";
       let isDay = true;
       let isSnow = true;
 
@@ -111,7 +111,7 @@
       function iniModel() {
         loader = new GLTFLoader();
         loader.load(
-          "materials/scene.gltf",
+          "./materials/scene.gltf",
           function (gltf) {
             scene.add(gltf.scene);
             gltf.animations; // Array <THREE.AnimationClip>
@@ -247,9 +247,9 @@
       dayButton.onclick = () => {
         isDay = true;
         if (isSnow) {
-          bgImagePath = "materials/images/sky-snow-day.jpeg";
+          bgImagePath = "./materials/images/sky-snow-day.jpeg";
         } else {
-          bgImagePath = "materials/images/sky-rain-day.jpeg";
+          bgImagePath = "./materials/images/sky-rain-day.jpeg";
         }
         scene.background = new THREE.TextureLoader().load(bgImagePath);
         scene.remove(ambientLight);
@@ -266,9 +266,9 @@
       nightButton.onclick = () => {
         isDay = false;
         if (isSnow) {
-          bgImagePath = "materials/images/sky-snow-night.jpeg";
+          bgImagePath = "./materials/images/sky-snow-night.jpeg";
         } else {
-          bgImagePath = "materials/images/sky-rain-night.jpeg";
+          bgImagePath = "./materials/images/sky-rain-night.jpeg";
         }
         scene.background = new THREE.TextureLoader().load(bgImagePath);
         scene.remove(ambientLight);
@@ -284,14 +284,14 @@
 
       snowButton.onclick = () => {
         isSnow = true;
-        texturePath = "materials/images/snowflake.png";
+        texturePath = "./materials/images/snowflake.png";
         velocityY = 0.3;
         dropSize = 0.5;
         let stayTime = 100;
         if (isDay) {
-          bgImagePath = "materials/images/sky-snow-day.jpeg";
+          bgImagePath = "./materials/images/sky-snow-day.jpeg";
         } else {
-          bgImagePath = "materials/images/sky-snow-night.jpeg";
+          bgImagePath = "./materials/images/sky-snow-night.jpeg";
         }
         scene.remove(points);
         iniDrop();
@@ -301,14 +301,14 @@
 
       rainButton.onclick = () => {
         isSnow = false;
-        texturePath = "materials/images/rain.png";
+        texturePath = "./materials/images/rain.png";
         velocityY = 0.5;
         dropSize = 0.3;
         stayTime = 10;
         if (isDay) {
-          bgImagePath = "materials/images/sky-rain-day.jpeg";
+          bgImagePath = "./materials/images/sky-rain-day.jpeg";
         } else {
-          bgImagePath = "materials/images/sky-rain-night.jpeg";
+          bgImagePath = "./materials/images/sky-rain-night.jpeg";
         }
         scene.remove(points);
         iniDrop();
